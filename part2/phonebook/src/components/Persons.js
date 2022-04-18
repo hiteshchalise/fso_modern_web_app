@@ -1,9 +1,18 @@
-import React, { Fragment } from "react";
+import React from "react";
 
-const Persons = ({ personsList }) => {
+const Persons = ({ personsList, handleDelete }) => {
+
+    const onClickListener = (person) => {
+        const confirm = window.confirm(`Delete ${person.name}?`);
+        if (confirm) handleDelete(person.id);
+    }
+
     return (
         <div>
-            {personsList.map(person => <Fragment key={person.id}>{person.name} {person.number}<br /></Fragment>)}
+            {personsList.map(person => <div key={person.id}>
+                {person.name} {person.number} &nbsp;
+                <button onClick={() => onClickListener(person)}>delete</button>
+            </div>)}
         </div>
     )
 }
