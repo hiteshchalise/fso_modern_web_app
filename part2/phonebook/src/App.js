@@ -3,8 +3,8 @@ import { useState } from 'react';
 import Persons from './components/Persons';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
+import Notification from './components/Notification'
 import phoneService from './services/phonebook'
-
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,6 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filterQuery, setFilterQuery] = useState('');
+  const [notificationMessage, setNotificationMessage] = useState({ message: '', error: false });
 
   const handleNameChange = (event) => setNewName(event.target.value);
   const handleNumberChange = (event) => setNewNumber(event.target.value);
@@ -23,6 +24,11 @@ const App = () => {
       .then(data => setPersons(data))
   }, [])
 
+  const setNotification = (message, error) => {
+    setNotificationMessage({ message, error });
+    setTimeout(() => { setNotificationMessage({ message: '', error: false }) }, 4000);
+  }
+
   const editPerson = (personId, person) => {
     phoneService.editPerson(personId, person).then(
       response => {
@@ -32,6 +38,7 @@ const App = () => {
         }));
         setNewName('');
         setNewNumber('');
+        setNotification(`${person.name}'s phone number is successfully edited`, false);
       }
     )
   }
@@ -58,15 +65,25 @@ const App = () => {
         setPersons(persons.concat(response));
         setNewName('');
         setNewNumber('');
+        setNotification(`Added ${newPerson.name}`,
+          false
+        );
       }
     );
 
   }
 
-  const handleDelete = (id) => {
-    phoneService.deletePerson(id).then(response => {
-      setPersons(persons.filter(person => person.id !== id))
-    });
+  const handleDelete = (person) => {
+    phoneService
+      .deletePerson(person.id)
+      .then(response => {
+        setPersons(persons.filter(p => p.id !== person.id))
+        setNotification(`Deleted ${person.name}`, false);
+      })
+      .catch(error => {
+        setNotification(`Information of ${person.name} has already been removed from server`, true);
+        setPersons(persons.filter(p => p.id !== person.id));
+      });
   }
 
   const personsList = filterQuery === '' ? persons : persons.filter((person) => person.name.toLowerCase().includes(filterQuery.toLowerCase()));
@@ -74,6 +91,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage.message} error={notificationMessage.error} />
       <Filter handleFilterChange={handleFilterChange} filterQuery={filterQuery} />
       <h3>Add a new</h3>
       <PersonForm handleFormSubmit={handleFormSubmit} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} newName={newName} newNumber={newNumber} />

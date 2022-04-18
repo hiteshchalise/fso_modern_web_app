@@ -4,7 +4,7 @@ const Persons = ({ personsList, handleDelete }) => {
 
     const onClickListener = (person) => {
         const confirm = window.confirm(`Delete ${person.name}?`);
-        if (confirm) handleDelete(person.id);
+        if (confirm) handleDelete(person);
     }
 
     return (
