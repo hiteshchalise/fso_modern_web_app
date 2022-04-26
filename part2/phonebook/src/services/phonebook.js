@@ -5,13 +5,13 @@ const BASE_URL = "/api/persons"
 const getAllPhonebook = () => {
     return axios
         .get(BASE_URL)
-        .then(response => response.data)
+        .then(response => response.data);
 }
 
 const addPerson = (person) => {
     return axios
         .post(BASE_URL, person)
-        .then(response => response.data);
+        .then(response => response.data)
 }
 
 const editPerson = (personId, person) => {

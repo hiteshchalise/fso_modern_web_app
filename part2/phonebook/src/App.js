@@ -30,17 +30,22 @@ const App = () => {
   }
 
   const editPerson = (personId, person) => {
-    phoneService.editPerson(personId, person).then(
-      response => {
-        setPersons(persons.map(person => {
-          if (person.id === response.id) return response;
-          return person;
-        }));
-        setNewName('');
-        setNewNumber('');
-        setNotification(`${person.name}'s phone number is successfully edited`, false);
-      }
-    )
+    phoneService
+      .editPerson(personId, person)
+      .then(
+        response => {
+          setPersons(persons.map(person => {
+            if (person.id === response.id) return response;
+            return person;
+          }));
+          setNewName('');
+          setNewNumber('');
+          setNotification(`${person.name}'s phone number is successfully edited`, false);
+        }
+      )
+      .catch(error => {
+        setNotification(error.response.data.error, true);
+      });
   }
 
   const handleFormSubmit = (event) => {
@@ -69,7 +74,9 @@ const App = () => {
           false
         );
       }
-    );
+    ).catch(error => {
+      setNotification(error.response.data.error, true);
+    });
 
   }
 
